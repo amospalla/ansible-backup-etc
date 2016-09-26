@@ -23,5 +23,7 @@
   cron:
     name: "backup-etc"
     job: "/usr/local/bin/backup-etc.sh /root/.backup-etc.files {{ backup_etc_retain }}"
+    minute: "0"
+    hour: "0"
   tags:
     - backup-etc
