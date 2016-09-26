@@ -1,0 +1,27 @@
+---
+- name: Template backup-etc.files
+  template:
+    src: backup-etc.files.j2
+    dest: /root/.backup-etc.files
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - backup-etc
+
+- name: Copy backup-etc.sh
+  copy:
+    src: backup-etc.sh
+    dest: /usr/local/bin/backup-etc.sh
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - backup-etc
+
+- name: Set cron entry
+  cron:
+    name: "backup-etc"
+    job: "/usr/local/bin/backup-etc.sh /root/.backup-etc.files {{ backup_etc_retain }}"
+  tags:
+    - backup-etc
