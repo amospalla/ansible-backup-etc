@@ -13,3 +13,4 @@ Work is done by a Bash script, this role only copies the script and sets the cro
 Optional:
 - _backup_etc_paths_: list of paths to be included. Full path is required (['/etc', [/var/spool/cron] if not specified).
 - _backup_etc_retain_: integer. Days to retain (7 if not specified).
+- _backup_etc_install_rsync_: boolean (default True). Install rsync.

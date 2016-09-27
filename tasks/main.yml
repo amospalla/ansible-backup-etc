@@ -27,3 +27,18 @@
     hour: "0"
   tags:
     - backup-etc
+
+- name: Install rsync (Debian)
+  apt:
+    name: rsync
+    update_cache: yes
+    cache_valid_time: 86400
+    state: present
+    install_recommends: no
+  when: ansible_os_family == 'Debian' and backup_etc_install_rsync
+
+- name: Install rsync (RedHat)
+  yum:
+    name: rsync
+    state: present
+  when: ansible_os_family == 'RedHat' and backup_etc_install_rsync

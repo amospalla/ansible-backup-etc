@@ -4,3 +4,4 @@ backup_etc_paths:
   - /etc
   - /var/spool/crontabs
   - /var/spool/cron
+backup_etc_install_rsync: True
