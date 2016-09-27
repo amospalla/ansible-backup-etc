@@ -3,3 +3,4 @@ backup_etc_retain: 7
 backup_etc_paths:
   - /etc
   - /var/spool/crontabs
+  - /var/spool/cron
