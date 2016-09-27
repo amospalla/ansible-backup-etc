@@ -2,10 +2,41 @@
 set -e
 
 ###### Variables ######################################################
+# File with paths to backup specified in parameter $1
+# Retention copies specified in parameter $2
 dest_folder=/var/backups/system
 
-###### Code ###########################################################
+###### Checks #########################################################
+if ! [[ -f "${1}" && -r "${1}" ]]
+then
+	echo "Specify input file"
+	exit 1
+fi
 
+if [[ -n "${2}" ]]
+then
+	retain="${2}"
+else
+	echo "Specify days to retain"
+	exit 1
+fi
+
+[[ ${retain} -gt 0 ]] || exit 1
+
+# Exit if it does not exist any of the specified folders
+existing_folders=0
+while read folder
+do
+	[[ -d "${folder}" ]] && existing_folders="$(( $existing_folders + 1 ))" || true
+done < "${1}"
+
+if [[ "${existing_folders}" -eq 0 ]]
+then
+	echo "Not found any of the specified folders" 
+	exit 1
+fi
+
+###### Code ###########################################################
 include_path(){
 	# Recursive print folder path: ie "include_path /a/b/c 1" returns:
 	# + /a/
@@ -25,39 +56,6 @@ include_path(){
 		fi
 	fi
 }
-
-# Paths to backup specified in file "${1}"
-
-if [[ -f "${1}" && -r "${1}" ]]
-then
-	readarray -t backup_folders < "${1}"
-else
-	echo "Specify input file"
-	exit 1
-fi
-
-if [[ -n "${2}" ]]
-then
-	retain="${2}"
-else
-	echo "Specify days to retain"
-	exit 1
-fi
-
-[[ ${retain} -gt 0 ]] || exit 1
-
-# Add specified folders that exist to a list
-for (( i=0; i<${#backup_folders[@]}; i++ ))
-do
-	[[ ! -d "${backup_folders[$i]}" ]] || folders[${#folders[@]}]="${backup_folders[$i]}"
-done
-
-# Exit if list of existing folders is empty
-if [[ "${#folders[@]}" -eq 0 ]]
-then
-	echo "Not found any of the specified folders" 
-	exit 1
-fi
 
 # Create destination folder if it does not exist
 [[ ! -d "${dest_folder}" ]] && mkdir -p "${dest_folder}"
@@ -79,10 +77,10 @@ done
 include_file="$(mktemp -p /tmp "$(basename "$0").XXXXX")"
 
 # Generate exclude file
-for (( i=0; i<${#folders[@]}; i++ ))
+while read folder
 do
-	include_path "${folders[$i]}" 1 >> "${include_file}"
-done
+	include_path "${folder}" 1 >> "${include_file}"
+done < "${1}"
 echo "- /***" >> "${include_file}"
 
 if [[ -d "${dest_folder}/2" ]]
