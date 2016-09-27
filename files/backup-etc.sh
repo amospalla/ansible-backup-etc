@@ -27,7 +27,7 @@ fi
 existing_folders=0
 while read folder
 do
-	echo "${folder}" | grep -q "^#" && continue
+	echo "${folder}" | grep -q -e "^#" -e "^\s*$" && continue
 	[[ -d "${folder}" ]] && existing_folders="$(( $existing_folders + 1 ))" || true
 done < "${1}"
 
@@ -80,7 +80,7 @@ include_file="$(mktemp -p /tmp "$(basename "$0").XXXXX")"
 # Generate exclude file
 while read folder
 do
-	echo "${folder}" | grep -q "^#" && continue
+	echo "${folder}" | grep -q -e "^#" -e "^\s*$" && continue
 	include_path "${folder}" 1 >> "${include_file}"
 done < "${1}"
 echo "- /***" >> "${include_file}"
